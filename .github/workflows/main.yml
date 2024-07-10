@@ -34,12 +34,7 @@ jobs:
 
       - name: Simulate Legitimate HTTP Requests
         run: |
-          # This call is allowed since example.com is specified in the allowed-domains variable above
           curl -I https://example.com
-
-      - name: Simulate Legitimate HTTP Requests
-        run: |
-          # This call is allowed since example.com is specified in the allowed-domains variable above
           curl -I https://gmail.com
 
       - name: Simulate Malicious Script
